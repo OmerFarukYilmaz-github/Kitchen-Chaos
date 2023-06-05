@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e819837f7f6db84dac7a1624f76423a, type: 3}
+  m_Script: {fileID: 11500000, guid: 933682218ae83f84d82c69d9974afffa, type: 3}
   m_Name: _RecipeListSO
   m_EditorClassIdentifier: 
   recipeSOList:
-  - {fileID: 11400000, guid: 772dda55c4cfb504c97444e850689fba, type: 2}
-  - {fileID: 11400000, guid: abcb5e8b7f43fec41a83760426dc0960, type: 2}
-  - {fileID: 11400000, guid: 38a6c544b7bd6084d90fa496f5245e87, type: 2}
-  - {fileID: 11400000, guid: 22d7aca7b2b25fb459073ee4fc1260b4, type: 2}
+  - {fileID: 11400000, guid: 2a9696cbedbbe884b988b489b8809db2, type: 2}
+  - {fileID: 11400000, guid: 82d7963231885104b9fba328cb62a320, type: 2}
+  - {fileID: 11400000, guid: 9eaed327d5a234745801fa1b71484be0, type: 2}
+  - {fileID: 11400000, guid: b4d95566825a718439ce65553d42881c, type: 2}

@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8dc21a10037aee741b16be775dd5891f, type: 3}
+  m_Script: {fileID: 11500000, guid: ab68cc6653c3dc44b9ef9fbc866c551b, type: 3}
   m_Name: Plate
   m_EditorClassIdentifier: 
-  prefab: {fileID: 1778288183289012027, guid: 3431100e4f446384c862ac84c0d87fcd, type: 3}
+  prefab: {fileID: 7025741079307011653, guid: c2d0ed646d199a548a183e1646669807, type: 3}
   sprite: {fileID: 21300000, guid: 3928afb5321bb3d489bbd4ac581b29a2, type: 3}
   objectName: Plate
