@@ -1,28 +1,32 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class CuttingCounterVisual : MonoBehaviour
+namespace KitchenChaos.Interactions.Visual
 {
-    [SerializeField] private CuttingCounter cuttingCounter;
-    private Animator animator;
-    private const string CUT = "Cut";
-
-    private void Awake()
+    public class CuttingCounterVisual : MonoBehaviour
     {
-        animator = GetComponent<Animator>();
+        [SerializeField] CuttingCounter _cuttingCounter;
 
+        Animator _animator;
+        const string CUT = "Cut";
+
+        void Awake()
+        {
+            _animator = GetComponent<Animator>();
+        }
+
+        void Start()
+        {
+            _cuttingCounter.OnCut += _cuttingCounter_OnCut;
+        }
+
+        void _cuttingCounter_OnCut()
+        {
+            _animator.SetTrigger(CUT);
+        }
+
+        void OnDestroy()
+        {
+            _cuttingCounter.OnCut -= _cuttingCounter_OnCut;
+        }
     }
-
-    private void Start()
-    {
-        cuttingCounter.OnCut += CuttingCounter_OnCut;
-    }
-
-    private void CuttingCounter_OnCut(object sender, System.EventArgs e)
-    {
-        animator.SetTrigger(CUT);
-
-    }
-
 }

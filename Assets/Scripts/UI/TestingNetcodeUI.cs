@@ -1,40 +1,35 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Netcode;
+using KitchenChaos.Interactions.Multiplayer;
 
-public class TestingNetcodeUI : MonoBehaviour
+namespace KitchenChaos.Multiplayer.UI
 {
-    [SerializeField] private Button startHostButton;
-    [SerializeField] private Button startClientButton;
-
-    private void Awake()
+    public class TestingNetcodeUI : MonoBehaviour
     {
-        startHostButton.onClick.AddListener(() => StartHost());
-        startClientButton.onClick.AddListener(() => StartClient());
+        [SerializeField] Button _startHostButton;
+        [SerializeField] Button _startClientButton;
 
-        
-    }
+        void Awake()
+        {
+            _startHostButton.onClick.AddListener(() =>
+            {
+                Debug.Log("Host");
+                GameMultiplayer.Instance.StartHost();
+                Hide();
+            });
 
-    private void StartHost()
-    {
-        Debug.Log("Host");
-        KitchenGameMultiplayer.Instance.StartHost();
-        Hide();
-    }
+            _startClientButton.onClick.AddListener(() =>
+            {
+                Debug.Log("Client");
+                GameMultiplayer.Instance.StartClient();
+                Hide();
+            });
+        }
 
-    private void StartClient()
-    {
-        Debug.Log("Client");
-        KitchenGameMultiplayer.Instance.StartClient();
-
-        Hide();
-    }
-
-    private void Hide()
-    {
-        gameObject.SetActive(false);
+        void Hide()
+        {
+            gameObject.SetActive(false);
+        }
     }
 }

@@ -1,39 +1,33 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class StoveBurnWarningUI : MonoBehaviour
+namespace KitchenChaos.Interactions.UI
 {
-    [SerializeField] private StoveCounter stoveCounter;
-
-    float burnShowProgressAmount = .5f;
-
-    private void Start()
+    public class StoveBurnWarningUI : MonoBehaviour
     {
-        stoveCounter.OnProgressChanged += StoveCounter_OnProgressChanged;
-        Hide();
-    }
+        [SerializeField] StoveCounter _stoveCounter;
 
-    private void StoveCounter_OnProgressChanged(object sender, IHasProgress.OnProgressChangedEventArgs e)
-    {
-        bool show = e.progressNormalized >= burnShowProgressAmount && stoveCounter.IsFried();
-
-        if(show)
+        void Start()
         {
-            Show();
+            _stoveCounter.OnProgressChanged += StoveCounter_OnProgressChanged;
+            DisplayWarningSign(false);
         }
-        else
+
+        void StoveCounter_OnProgressChanged(float progress)
         {
-            Hide();
+            float burnShowProgressAmount = .5f;
+            bool show = _stoveCounter.IsFried() && progress >= burnShowProgressAmount;
+
+            if (show)
+                DisplayWarningSign(true);
+            else
+                DisplayWarningSign(false);      
         }
-    }
 
-    private void Show()
-    {
-        gameObject.SetActive(true);
-
-    }
-
-    private void Hide()
-    {
-        gameObject.SetActive(false);
+        void DisplayWarningSign(bool shouldDisplay)
+        {
+            gameObject.SetActive(shouldDisplay);
+        }
     }
 }

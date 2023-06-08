@@ -1,40 +1,42 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlatesCounterVisual : MonoBehaviour
+namespace KitchenChaos.Interactions.Visual
 {
-    [SerializeField] private PlatesCounter platesCounter;
-    [SerializeField] private Transform counterTopPoint;
-    [SerializeField] private Transform plateVisualPrefab;
-
-    private List<GameObject> plateVisualGameObjectList;
-    private float plateOffsetY = 0.1f;
-
-
-    private void Awake()
+    public class PlatesCounterVisual : MonoBehaviour
     {
-        plateVisualGameObjectList = new();
-    }
-    private void Start()
-    {
-        platesCounter.OnPlateSpawned += PlatesCounter_OnPlateSpawned;
-        platesCounter.OnPlateRemoved += PlatesCounter_OnPlateRemoved;
-    }
+        [SerializeField] PlatesCounter _platesCounter;
+        [SerializeField] Transform _counterSpawnPoint;
+        [SerializeField] Transform _plateVisualPrefab;
+        [SerializeField] float _spawnOffsetY = .1f;
+        List<GameObject> _plateVisualsList = new List<GameObject>();
 
-    private void PlatesCounter_OnPlateRemoved(object sender, System.EventArgs e)
-    {
-        GameObject plateGameObject = plateVisualGameObjectList[^1];
-        plateVisualGameObjectList.Remove(plateGameObject);
-        Destroy(plateGameObject);
-    }
+        private void Start()
+        {
+            _platesCounter.OnPlateSpawned += _platesCounter_OnPlateSpawned;
+            _platesCounter.OnPlateRemoved += _platesCounter_OnPlateRemoved;
+        }
 
-    private void PlatesCounter_OnPlateSpawned(object sender, System.EventArgs e)
-    {
-        Transform plateVisualTransform = Instantiate(plateVisualPrefab, counterTopPoint);
+        private void _platesCounter_OnPlateSpawned()
+        {
+            Transform plateVisualTransform = Instantiate(_plateVisualPrefab, _counterSpawnPoint);
 
-        plateVisualTransform.localPosition = new Vector3(0, plateOffsetY * plateVisualGameObjectList.Count, 0);
+            plateVisualTransform.localPosition = new Vector3(0, _spawnOffsetY * _plateVisualsList.Count, 0);
 
-        plateVisualGameObjectList.Add(plateVisualTransform.gameObject);
+            _plateVisualsList.Add(plateVisualTransform.gameObject);
+        }
+
+        private void _platesCounter_OnPlateRemoved()
+        {
+            GameObject plate = _plateVisualsList[_plateVisualsList.Count - 1];
+            _plateVisualsList.Remove(plate);
+            Destroy(plate); //prototype, implement pooling
+        }
+
+        void OnDestroy()
+        {
+            _platesCounter.OnPlateSpawned -= _platesCounter_OnPlateSpawned;
+            _platesCounter.OnPlateRemoved -= _platesCounter_OnPlateRemoved;
+        }
     }
 }

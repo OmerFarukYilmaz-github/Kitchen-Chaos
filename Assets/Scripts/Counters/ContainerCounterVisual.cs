@@ -1,26 +1,32 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class ContainerCounterVisual : MonoBehaviour
+namespace KitchenChaos.Interactions.Visual
 {
-    [SerializeField] private ContainerCounter containerCounter;
-    private Animator animator;
-    private const string OPEN_CLOSE = "OpenClose";
-
-    private void Awake()
+    public class ContainerCounterVisual : MonoBehaviour
     {
-        animator = GetComponent<Animator>();
+        [SerializeField] ContainerCounter _containerCounter;
 
-    }
+        Animator _animator;
+        const string OPEN_CLOSE = "OpenClose";
 
-    private void Start()
-    {
-        containerCounter.OnPlayerGrabbedObject += ContainerCounter_OnPlayerGrabbedObject;
-    }
+        void Awake()
+        {
+            _animator = GetComponent<Animator>();
+        }
 
-    private void ContainerCounter_OnPlayerGrabbedObject(object sender, System.EventArgs e)
-    {
-        animator.SetTrigger(OPEN_CLOSE);
+        void Start()
+        {
+            _containerCounter.OnPlayerGrabbedObject += _containerCounter_OnPlayerGrabbedObject;
+        }
+
+        void _containerCounter_OnPlayerGrabbedObject()
+        {
+            _animator.SetTrigger(OPEN_CLOSE);
+        }
+
+        void OnDestroy()
+        {
+            _containerCounter.OnPlayerGrabbedObject -= _containerCounter_OnPlayerGrabbedObject;
+        }
     }
 }

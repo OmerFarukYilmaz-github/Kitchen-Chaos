@@ -1,43 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using KitchenChaos.Core;
 
-public class WaitingForOtherPlayersUI : MonoBehaviour
+namespace KitchenChaos.PlayerInput.UI
 {
-
-    private void Start()
+    public class WaitingForOtherPlayersUI : MonoBehaviour
     {
-        KitchenGameManager.Instance.OnLocalPlayerReadyChanged += KitchenGameManager_OnLocalPlayerReadyChanged;
-        KitchenGameManager.Instance.OnStateChanged += KitchenGameManager_OnStateChanged;
-
-        Hide();
-    }
-
-    private void KitchenGameManager_OnStateChanged(object sender, System.EventArgs e)
-    {
-        if (KitchenGameManager.Instance.IsCountdownToStartActive())
+        private void Start()
         {
+            GameManager.Instance.OnLocalPlayerReadyChanged += GameManager_OnLocalPlayerReadyChanged;
+            GameManager.Instance.OnStateChanged += GameManager_OnStateChanged;
+
             Hide();
         }
-    }
 
-    private void KitchenGameManager_OnLocalPlayerReadyChanged(object sender, System.EventArgs e)
-    {
-        if (KitchenGameManager.Instance.IsLocalPlayerReady())
+        private void GameManager_OnStateChanged()
         {
-            Show();
+            if (GameManager.Instance.IsCountdownActive())
+                Hide();
         }
 
-    }
+        private void GameManager_OnLocalPlayerReadyChanged()
+        {
+            if (GameManager.Instance.IsLocalPlayerReady)
+                Show();
+        }
 
-    private void Show()
-    {
-        gameObject.SetActive(true);
+        void Show()
+        {
+            gameObject.SetActive(true);
+        }
 
-    }
+        void Hide()
+        {
+            gameObject.SetActive(false);
+        }
 
-    private void Hide()
-    {
-        gameObject.SetActive(false);
     }
 }

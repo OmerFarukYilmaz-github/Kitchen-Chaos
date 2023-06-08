@@ -1,27 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using KitchenChaos.Core;
 
-public class DeliveryCounter : BaseCounter
+namespace KitchenChaos.Interactions
 {
-    public static DeliveryCounter Instance {  get; private set; }
-
-    private void Awake()
+    public class DeliveryCounter : BaseCounter
     {
-        Instance = this;
-    }
-
-    public override void Interact(Player player)
-    {
-        if (player.HasKitchenObject())
+        public override void Interact(PlayerInteractions player)
         {
-            if(player.GetKitchenObject().TryGetPlate(out PlateKitchenObject plateKitchenObject))
+            if (player.HasKitchenObject())
             {
+                if (player.GetKitchenObject().TryGetPlate(out PlateKitchenObject plate))
+                {
+                    DeliveryManager.Instance.DeliverRecipe(plate);
 
-                DeliveryManager.Instance.DeliverRecipe(plateKitchenObject);
-
-                KitchenObject.DestroyKitchenObject(plateKitchenObject);
-
+                    KitchenObject.DestroyKitchenObject(player.GetKitchenObject());
+                }
             }
         }
     }

@@ -4,61 +4,85 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class BaseCounter : NetworkBehaviour, IKitchenObjectParent
+namespace KitchenChaos.Interactions
 {
-    public static event EventHandler OnAnyObjectPlacedHere;
-
-    public static void ResetStaticData()
+    public class BaseCounter : NetworkBehaviour, IKitchenObjectHolder
     {
-        OnAnyObjectPlacedHere = null;
-    }
+        public static event Action<BaseCounter> OnAnyObjectPlaced;
 
-    [SerializeField] private Transform counterTopPoint;
-    private KitchenObject kitchenObject;
+        [SerializeField] Transform _spawnPoint;
 
+        KitchenObject _kitchenObject;
 
-
-    public virtual void Interact(Player player)
-    {
-        Debug.LogError("BaseCounter Interact");
-    } 
-    public virtual void InteractAlternate(Player player)
-    {
-        //Debug.LogError("BaseCounter InteractAlternate");
-    }
-
-    public Transform GetKitchenObjectFollowTransform()
-    {
-        return counterTopPoint;
-    }
-
-    public void SetKitchenObject(KitchenObject kitchenObject)
-    {
-        this.kitchenObject = kitchenObject;
-
-        if(kitchenObject != null )
+        public virtual void Interact(PlayerInteractions player)
         {
-            OnAnyObjectPlacedHere?.Invoke(this, EventArgs.Empty);
+            Debug.Log("BaseCounter.Interact");
         }
-    }
 
-    public KitchenObject GetKitchenObject()
-    {
-        return kitchenObject;
-    }
+        public void ClearKitchenObject()
+        {
+            _kitchenObject = null;
+        }
 
-    public void ClearKitchenObject()
-    {
-        kitchenObject = null;
-    }
+        public bool HasKitchenObject()
+        {
+            return (_kitchenObject != null);
+        }
 
-    public bool HasKitchenObject()
-    {
-        return kitchenObject != null;
-    }
+        public Transform GetKitchenObjectSpawnPoint()
+        {
+            return _spawnPoint;
+        }
 
-    public NetworkObject GetNetworkObject()
-    {
-        return NetworkObject;
+        public void SetKitchenObject(KitchenObject kitchenObject)
+        {
+            _kitchenObject = kitchenObject;
+
+            if (_kitchenObject != null)
+                OnAnyObjectPlaced?.Invoke(this);
+        }
+
+        public KitchenObject GetKitchenObject()
+        {
+            return _kitchenObject;
+        }
+
+        public virtual void InteractAlt(PlayerInteractions player)
+        {
+            Debug.Log("BaseCounter.InteractAlt");
+        }
+
+        public bool AttemptTransferFromCounterToPlate(PlayerInteractions player)
+        {
+            if (player.GetKitchenObject().TryGetPlate(out PlateKitchenObject plate))
+            {
+                plate.TryAddIngredient(GetKitchenObject().KitchenObjectSO);
+                KitchenObject.DestroyKitchenObject(GetKitchenObject());
+
+                return true;
+            }
+            return false;
+        }
+
+        public void AttemptTransferFromPlayerToPlate(PlayerInteractions player)
+        {
+            if (GetKitchenObject().TryGetPlate(out PlateKitchenObject plate))
+            {
+                KitchenObject playerKitchenObject = player.GetKitchenObject();
+
+                if (plate.TryAddIngredient(playerKitchenObject.KitchenObjectSO))
+                    KitchenObject.DestroyKitchenObject(playerKitchenObject);
+            }
+        }
+
+        public static void ResetStaticData()
+        {
+            OnAnyObjectPlaced = null;
+        }
+
+        public NetworkObject GetNetworkObject()
+        {
+            return NetworkObject;
+        }
     }
 }

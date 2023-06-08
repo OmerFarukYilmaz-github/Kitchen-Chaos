@@ -1,39 +1,50 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
+using Unity.Netcode;
 
-public class ContainerCounter : BaseCounter
+namespace KitchenChaos.Interactions
 {
-
-    public event EventHandler OnPlayerGrabbedObject;
-    [SerializeField] private KitchenObjectSO kitchenObjectSO;
-
-
-
-    public override void Interact(Player player)
+    public class ContainerCounter : BaseCounter
     {
-        if (!player.HasKitchenObject())
+        public event Action OnPlayerGrabbedObject;
+
+        [SerializeField] SO_KitchenObject _kitchenObjectSO;
+
+        public override void Interact(PlayerInteractions player)
         {
-            KitchenObject.SpawnKitchenObject(kitchenObjectSO, player);
-            InteractLogicServerRpc();
+            if (!HasKitchenObject())
+            {
+                if (player.HasKitchenObject())
+                    player.GetKitchenObject().SetKitchenObjectHolder(this);
+                else
+                {
+                    KitchenObject.SpawnKitchenObject(_kitchenObjectSO, player);
+                    InteractLogicServerRpc();
+                }
+            }
+            else
+            {
+                if (!player.HasKitchenObject())
+                    GetKitchenObject().SetKitchenObjectHolder(player);
+                else
+                {
+                    if (!AttemptTransferFromCounterToPlate(player))
+                        AttemptTransferFromPlayerToPlate(player);
+                }
+            }               
         }
 
+        [ServerRpc(RequireOwnership = false)]
+        void InteractLogicServerRpc()
+        {
+            InteractLogicClientRpc();
+        }
+
+        [ClientRpc]
+        void InteractLogicClientRpc()
+        {
+            OnPlayerGrabbedObject?.Invoke();
+        }
     }
-
-    [ServerRpc(RequireOwnership = false)]
-    private void InteractLogicServerRpc()
-    {
-        InteractLogicClientRpc();
-    }
-
-    [ClientRpc]
-    private void InteractLogicClientRpc()
-    {
-        OnPlayerGrabbedObject?.Invoke(this, EventArgs.Empty);
-
-    }
-
-
 }
+

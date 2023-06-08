@@ -1,40 +1,41 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using UnityEditor;
 using UnityEngine;
 
-public class TrashCounter : BaseCounter
+namespace KitchenChaos.Interactions
 {
-
-    public static event EventHandler OnAnyObjectTrashed;
-
-    new public static void ResetStaticData()
+    public class TrashCounter : BaseCounter
     {
-        OnAnyObjectTrashed = null;
-    }
+        public static Action<TrashCounter> OnAnyObjectTrashed;
 
-    public override void Interact(Player player)
-    {
-        if (player.HasKitchenObject())
+        //prototype code - implement pooling
+        public override void Interact(PlayerInteractions player)
         {
-            KitchenObject.DestroyKitchenObject(player.GetKitchenObject());
+            if (player.HasKitchenObject())
+            {
+                KitchenObject.DestroyKitchenObject(player.GetKitchenObject());
 
-            InteractLogicServerRpc();
+                InteractLogicServerRpc();
+            }
         }
-    }
+
+        [ServerRpc(RequireOwnership = false)]
+        void InteractLogicServerRpc()
+        {
+            InteractLogicClientRpc();
+        }
+
+        [ClientRpc]
+        void InteractLogicClientRpc()
+        {
+            OnAnyObjectTrashed?.Invoke(this);
+        }
 
 
-    [ServerRpc(RequireOwnership = false)]
-    private void InteractLogicServerRpc()
-    {
-        InteractLogicClientRpc();
-    }
-
-    [ClientRpc]
-    private void InteractLogicClientRpc()
-    {
-        OnAnyObjectTrashed?.Invoke(this, EventArgs.Empty);
+        new public static void ResetStaticData()
+        {
+            OnAnyObjectTrashed = null;
+        }
     }
 }

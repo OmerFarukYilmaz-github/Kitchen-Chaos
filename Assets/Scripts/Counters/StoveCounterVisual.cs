@@ -2,22 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StoveCounterVisual : MonoBehaviour
+namespace KitchenChaos.Interactions.Visual
 {
-    [SerializeField] private GameObject stoveOnGameObject;
-    [SerializeField] private GameObject particlesGameObject;
-    [SerializeField] private StoveCounter stoveCounter;
-
-    private void Start()
+    public class StoveCounterVisual : MonoBehaviour
     {
-        stoveCounter.OnStateChanged += StoveCounter_OnStateChanged;
-    }
+        [SerializeField] StoveCounter _stoveCounter;
+        [SerializeField] GameObject _stoveOnVisual;
+        [SerializeField] GameObject _particles;
 
-    private void StoveCounter_OnStateChanged(object sender, StoveCounter.OnStateChangedEventArgs e)
-    {
-        bool showVisual = e.state == StoveCounter.State.Frying || e.state == StoveCounter.State.Fried;
+        void Start()
+        {
+            StoveCounter.OnStateChanged += _stoveCounter_OnStateChanged;
+        }
 
-        stoveOnGameObject.SetActive(showVisual);
-        particlesGameObject.SetActive(showVisual);
+        void _stoveCounter_OnStateChanged(StoveCounter.State state, StoveCounter counter)
+        {
+            if (_stoveCounter != counter) return;
+
+            bool showVisual = state == StoveCounter.State.Frying || state == StoveCounter.State.Fried;
+
+            _stoveOnVisual.SetActive(showVisual);
+            _particles.SetActive(showVisual);
+        }
+
+        void OnDestroy()
+        {
+            StoveCounter.OnStateChanged -= _stoveCounter_OnStateChanged;
+        }
     }
 }

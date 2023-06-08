@@ -1,76 +1,78 @@
+using KitchenChaos.Core;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class PlatesCounter : BaseCounter
+namespace KitchenChaos.Interactions
 {
-
-    public event EventHandler OnPlateSpawned;
-    public event EventHandler OnPlateRemoved;
-
-    [SerializeField] private KitchenObjectSO plateKitchenObjectSO;
-    private float spawnPlateTimer;
-    private float spawnPlateTimerMax = 4f;
-    private int platesSpawnedAmount;
-    private int platesSpawnedAmountMax = 4;
-
-    private void Update()
+    public class PlatesCounter : BaseCounter
     {
-        if (!IsServer) return;
+        public event Action OnPlateSpawned;
+        public event Action OnPlateRemoved;
 
-        spawnPlateTimer += Time.deltaTime;
+        [SerializeField] SO_KitchenObject _plateSO;
+        [SerializeField] float _spawnPlateTimerMax = 4f;
+        [SerializeField] int _platesSpawnedAmountMax = 4;
 
-        if (spawnPlateTimer > spawnPlateTimerMax)
+        float spawnPlateTimer;
+        int _platesSpawnedAmount;
+
+        private void Update()
         {
-            spawnPlateTimer = 0;
-            if(KitchenGameManager.Instance.IsGamePlaying() && platesSpawnedAmount < platesSpawnedAmountMax)
+            if (!IsServer) return;
+            if (!GameManager.Instance.IsGamePlaying()) return;
+
+            spawnPlateTimer += Time.deltaTime;
+
+            if (spawnPlateTimer > _spawnPlateTimerMax)
             {
-                SpawnPlateServerRpc();
+                spawnPlateTimer = 0f;
+
+                if (_platesSpawnedAmount < _platesSpawnedAmountMax)
+                {
+                    SpawnPlateServerRpc();
+                }
             }
         }
-    }
 
-
-    [ServerRpc]
-    private void SpawnPlateServerRpc()
-    {
-        SpawnPlateClientRpc();
-    }
-
-    [ClientRpc]
-    private void SpawnPlateClientRpc()
-    {
-        platesSpawnedAmount++;
-        OnPlateSpawned?.Invoke(this, EventArgs.Empty);
-    }
-
-    public override void Interact(Player player)
-    {
-        if (!player.HasKitchenObject())
+        [ServerRpc]
+        void SpawnPlateServerRpc()
         {
-            if(platesSpawnedAmount > 0)
+            SpawnPlateClientRpc();
+        }
+
+        [ClientRpc]
+        void SpawnPlateClientRpc()
+        {
+            _platesSpawnedAmount++;
+            OnPlateSpawned?.Invoke();
+        }
+
+
+        public override void Interact(PlayerInteractions player)
+        {
+            if (!player.HasKitchenObject())
             {
-                KitchenObject.SpawnKitchenObject(plateKitchenObjectSO, player);
-                InteractLogicServerRpc();
+                if (_platesSpawnedAmount > 0)
+                {
+                    KitchenObject.SpawnKitchenObject(_plateSO, player);
+                    InteractLogicServerRpc();
+                }
             }
         }
+
+        [ServerRpc(RequireOwnership = false)]
+        void InteractLogicServerRpc()
+        {
+            InteractLogicClientRpc();
+        }
+
+        [ClientRpc]
+        void InteractLogicClientRpc()
+        {
+            _platesSpawnedAmount--;
+            OnPlateRemoved?.Invoke();
+        }
     }
-
-    [ServerRpc(RequireOwnership = false)]
-    private void InteractLogicServerRpc()
-    {
-        InteractLogicClientRpc();
-    }
-
-    [ClientRpc]
-    private void InteractLogicClientRpc()
-    {
-        platesSpawnedAmount--;
-        OnPlateRemoved?.Invoke(this, EventArgs.Empty);
-    }
-
-
-
 }

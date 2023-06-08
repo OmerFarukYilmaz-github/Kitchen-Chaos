@@ -3,47 +3,46 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ProgressBarUI : MonoBehaviour
+namespace KitchenChaos.Interactions.UI
 {
-    [SerializeField] private GameObject hasProgressGameObject;
-    [SerializeField] private Image barImage;
-
-    private IHasProgress hasProgress;
-
-    private void Start()
+    public class ProgressBarUI : MonoBehaviour
     {
-        hasProgress = hasProgressGameObject.GetComponent<IHasProgress>();
-        hasProgress.OnProgressChanged += HasProgress_OnProgressChanged;
+        [SerializeField] GameObject _progressTracker;
+        [SerializeField] Image _barImage;
 
-        SetBarImageFillAmount(0f);
-    }
+        IHasProgress _progress;
 
-    private void HasProgress_OnProgressChanged(object sender, IHasProgress.OnProgressChangedEventArgs e)
-    {
-        SetBarImageFillAmount(e.progressNormalized);
-    }
-
-    private void Show()
-    {
-        gameObject.SetActive(true);
-    }
-
-    private void Hide()
-    {
-        gameObject.SetActive(false);
-
-    }
-
-    private void SetBarImageFillAmount(float amount)
-    {
-        barImage.fillAmount = amount;
-        if(amount == 0f || amount == 1f)
+        void Start()
         {
-            Hide();
+            _progress = _progressTracker.GetComponent<IHasProgress>();
+
+            if (_progress == null)
+                Debug.LogError(_progressTracker + " does not have a component that implements IHasProgress!");
+
+            _progress.OnProgressChanged += _progress_OnProgressChanged;
+
+            _barImage.fillAmount = 0f;
+            DisplayProgressBar(false);
         }
-        else
+
+        void _progress_OnProgressChanged(float obj)
         {
-            Show();
+            _barImage.fillAmount = obj;
+
+            if (obj == 0f || obj == 1f)
+                DisplayProgressBar(false);
+            else
+                DisplayProgressBar(true);
+        }
+
+        void DisplayProgressBar(bool shouldDisplay)
+        {
+            gameObject.SetActive(shouldDisplay);
+        }
+
+        void OnDestroy()
+        {
+            _progress.OnProgressChanged -= _progress_OnProgressChanged;
         }
     }
 }

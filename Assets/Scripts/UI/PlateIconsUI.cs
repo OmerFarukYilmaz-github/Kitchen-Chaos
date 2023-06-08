@@ -2,39 +2,36 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlateIconsUI : MonoBehaviour
+namespace KitchenChaos.Interactions.UI
 {
-    [SerializeField] private PlateKitchenObject plateKitchenObject;
-    [SerializeField] private Transform iconTemplate;
-    private void Awake()
+    public class PlateIconsUI : MonoBehaviour
     {
-        iconTemplate.gameObject.SetActive(false);
-    }
+        [SerializeField] PlateKitchenObject _plateKitchenObject;
+        [SerializeField] Transform _iconTemplate;
 
-    private void Start()
-    {
-        plateKitchenObject.OnIngredientAdded += PlateKitchenObject_OnIngredientAdded;
-    }
-
-    private void PlateKitchenObject_OnIngredientAdded(object sender, PlateKitchenObject.OnIngredientAddedEventArgs e)
-    {
-        UpdateVisual();
-    }
-
-    private void UpdateVisual()
-    {
-        foreach(Transform child in transform)
+        void Start()
         {
-            if(child != iconTemplate)
-            {
+            _plateKitchenObject.OnIngredientAdded += _plateKitchenObject_OnIngredientAdded;
+
+            foreach (Transform child in transform)
                 Destroy(child.gameObject);
-            }
         }
-        foreach(KitchenObjectSO kitchenObjectSO in plateKitchenObject.GetKitchenObjectSOList())
+
+        void _plateKitchenObject_OnIngredientAdded(SO_KitchenObject kitchenObject)
         {
-            Transform iconTransform = Instantiate(iconTemplate, transform);
-            iconTransform.gameObject.SetActive(true);
-            iconTransform.GetComponent<PlateIconSingleUI>().SetKitchenObjectSO(kitchenObjectSO);
+            UpdateVisual(kitchenObject);
+        }
+
+        //prototyping. implement pooling
+        void UpdateVisual(SO_KitchenObject kitchenObject)
+        {
+            Transform iconTransform = Instantiate(_iconTemplate, transform);
+            iconTransform.GetComponent<IconSingleUI>().SetKitchenObjectSO(kitchenObject);
+        }
+
+        void OnDestroy()
+        {
+            _plateKitchenObject.OnIngredientAdded -= _plateKitchenObject_OnIngredientAdded;
         }
     }
 }
