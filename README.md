@@ -2,7 +2,7 @@
  
 ![mAİN MENU](https://github.com/OmerFarukYilmaz-github/Kitchen-Chaos/assets/66321088/a64a9304-c023-453e-865a-c237c363f209)
 <BR/>
-![Uploading hOW TO PLAY.PNG…]()
+![hOW TO PLAY](https://github.com/OmerFarukYilmaz-github/Kitchen-Chaos/assets/66321088/675d9390-b79b-4bce-b0ea-4b063d6222b7)
 <BR/>
 ![GAME](https://github.com/OmerFarukYilmaz-github/Kitchen-Chaos/assets/66321088/ac261359-0d5f-404b-8d4a-5debeffda849)
 <BR/>
